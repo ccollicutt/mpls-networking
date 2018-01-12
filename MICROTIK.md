@@ -10,11 +10,15 @@ MPLS is not working yet with CHR it seems.
 
 Several routers are deployed into an OpenStack cloud. Neutron networks are used as links. The routers are configured to be able to support MPLS tunnels.
 
-## OpenStack
+### OpenStack
 
 These virtual routers are deploying into an OpenStack cloud. The cloud has a global MTU of 1500 and it can't be increased. The links/OpenStack networks are VXLAN based but the OS of the virtual machine would not know that. The cloud is setup in such a way that the VXLAN networks also have an MTU of 1500. The underlying cloud network can support higher MTUs, but based on the configuration of OpenStack in this cloud the tenant virtual machines can only have a max of 1500.
 
-## Network Diagram
+### MicroTik Version
+
+Cloud Hosted Router 6.39.3.
+
+### Network Diagram
 
 ![mpls netowrk diagram](/img/mpls-microtik.jpg)
 
