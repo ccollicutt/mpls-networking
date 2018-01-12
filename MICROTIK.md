@@ -20,136 +20,145 @@ Cloud Hosted Router 6.39.3.
 
 ### Network Diagram
 
-![mpls netowrk diagram](/img/mpls-microtik.jpg)
+![mpls netowrk diagram](/img/${MPLS_NAME}-microtik.jpg)
 
 ## Setup Networks
+
+First, setup a few variables. This is so that it is easier to have multiple deployments.
+
+```
+export MPLS_NAME="mpls2"
+# NOTE: Just first 3 octets
+export MPLS_MGMT_NET="192.168.1"
+export MPLS_MT_IMAGE="chr-6.41"
+```
 
 Create networks.
 
 ```
-os network create mpls-mgmt --disable-port-security
-os network create mpls-link1 --disable-port-security
-os network create mpls-link2 --disable-port-security
-os network create mpls-link3 --disable-port-security
-os network create mpls-link4 --disable-port-security
-os network create mpls-lan1 --disable-port-security
-os network create mpls-lan2 --disable-port-security
+os network create ${MPLS_NAME}-mgmt --disable-port-security
+os network create ${MPLS_NAME}-link1 --disable-port-security
+os network create ${MPLS_NAME}-link2 --disable-port-security
+os network create ${MPLS_NAME}-link3 --disable-port-security
+os network create ${MPLS_NAME}-link4 --disable-port-security
+os network create ${MPLS_NAME}-lan1 --disable-port-security
+os network create ${MPLS_NAME}-lan2 --disable-port-security
 ```
 
 Create subnets.
 
 *NOTE: dhcp disabled on link networks.*
 
-*NOTE: Gateway on mpls-mgmt-subnet is .250. Gateway has to be specified on links but won't actually be used. We are using .1 as the R1 IP on all networks.*
+*NOTE: Gateway on ${MPLS_NAME}-mgmt-subnet is .250. Gateway has to be specified on links but won't actually be used. We are using .1 as the R1 IP on all networks.*
 
 ```
-os subnet create --gateway=192.168.0.250 --subnet-range=192.168.0.0/24 --network mpls-mgmt mpls-mgmt-subnet
-os subnet create --no-dhcp --gateway 192.168.10.250 --subnet-range=192.168.10.0/24 --network mpls-lan1 mpls-lan1-subnet
-os subnet create --no-dhcp --gateway 192.168.20.250 --subnet-range=192.168.20.0/24 --network mpls-lan2 mpls-lan2-subnet
-os subnet create --no-dhcp --gateway 172.16.1.250 --subnet-range=172.16.1.0/24 --network mpls-link1 mpls-link1-subnet
-os subnet create --no-dhcp --gateway 172.16.2.250 --subnet-range=172.16.2.0/24 --network mpls-link2 mpls-link2-subnet
-os subnet create --no-dhcp --gateway 172.16.3.250 --subnet-range=172.16.3.0/24 --network mpls-link3 mpls-link3-subnet
-os subnet create --no-dhcp --gateway 172.16.4.250 --subnet-range=172.16.4.0/24 --network mpls-link4 mpls-link4-subnet
+os subnet create --gateway=${MPLS_MGMT_NET}.250 --subnet-range=${MPLS_MGMT_NET}.0/24 --network ${MPLS_NAME}-mgmt ${MPLS_NAME}-mgmt-subnet
+os subnet create --no-dhcp --gateway 192.168.10.250 --subnet-range=192.168.10.0/24 --network ${MPLS_NAME}-lan1 ${MPLS_NAME}-lan1-subnet
+os subnet create --no-dhcp --gateway 192.168.20.250 --subnet-range=192.168.20.0/24 --network ${MPLS_NAME}-lan2 ${MPLS_NAME}-lan2-subnet
+os subnet create --no-dhcp --gateway 172.16.1.250 --subnet-range=172.16.1.0/24 --network ${MPLS_NAME}-link1 ${MPLS_NAME}-link1-subnet
+os subnet create --no-dhcp --gateway 172.16.2.250 --subnet-range=172.16.2.0/24 --network ${MPLS_NAME}-link2 ${MPLS_NAME}-link2-subnet
+os subnet create --no-dhcp --gateway 172.16.3.250 --subnet-range=172.16.3.0/24 --network ${MPLS_NAME}-link3 ${MPLS_NAME}-link3-subnet
+os subnet create --no-dhcp --gateway 172.16.4.250 --subnet-range=172.16.4.0/24 --network ${MPLS_NAME}-link4 ${MPLS_NAME}-link4-subnet
 ```
 
 Create ports.
 
 ```
 # R1
-os port create --network mpls-mgmt --fixed-ip subnet=mpls-mgmt-subnet,ip-address=192.168.0.1 mpls-r1-mgmt
-os port create --network mpls-link1 --fixed-ip subnet=mpls-link1-subnet,ip-address=172.16.1.1 mpls-r1-link1
-os port create --network mpls-link4 --fixed-ip subnet=mpls-link4-subnet,ip-address=172.16.4.1 mpls-r1-link4
-os port create --network mpls-lan1 --fixed-ip subnet=mpls-lan1-subnet,ip-address=192.168.10.1 mpls-r1-lan1
+os port create --network ${MPLS_NAME}-mgmt --fixed-ip subnet=${MPLS_NAME}-mgmt-subnet,ip-address=${MPLS_MGMT_NET}.11 ${MPLS_NAME}-r1-mgmt
+os port create --network ${MPLS_NAME}-link1 --fixed-ip subnet=${MPLS_NAME}-link1-subnet,ip-address=172.16.1.1 ${MPLS_NAME}-r1-link1
+os port create --network ${MPLS_NAME}-link4 --fixed-ip subnet=${MPLS_NAME}-link4-subnet,ip-address=172.16.4.1 ${MPLS_NAME}-r1-link4
+os port create --network ${MPLS_NAME}-lan1 --fixed-ip subnet=${MPLS_NAME}-lan1-subnet,ip-address=192.168.10.1 ${MPLS_NAME}-r1-lan1
 
 # R2
-os port create --network mpls-mgmt --fixed-ip subnet=mpls-mgmt-subnet,ip-address=192.168.0.2 mpls-r2-mgmt
-os port create --network mpls-link1 --fixed-ip subnet=mpls-link1-subnet,ip-address=172.16.1.2 mpls-r2-link1
-os port create --network mpls-link2 --fixed-ip subnet=mpls-link2-subnet,ip-address=172.16.2.2 mpls-r2-link2
+os port create --network ${MPLS_NAME}-mgmt --fixed-ip subnet=${MPLS_NAME}-mgmt-subnet,ip-address=${MPLS_MGMT_NET}.12 ${MPLS_NAME}-r2-mgmt
+os port create --network ${MPLS_NAME}-link1 --fixed-ip subnet=${MPLS_NAME}-link1-subnet,ip-address=172.16.1.2 ${MPLS_NAME}-r2-link1
+os port create --network ${MPLS_NAME}-link2 --fixed-ip subnet=${MPLS_NAME}-link2-subnet,ip-address=172.16.2.2 ${MPLS_NAME}-r2-link2
 
 # R3
-os port create --network mpls-mgmt --fixed-ip subnet=mpls-mgmt-subnet,ip-address=192.168.0.3 mpls-r3-mgmt
-os port create --network mpls-link2 --fixed-ip subnet=mpls-link2-subnet,ip-address=172.16.2.3 mpls-r3-link2
-os port create --network mpls-link3 --fixed-ip subnet=mpls-link3-subnet,ip-address=172.16.3.3 mpls-r3-link3
-os port create --network mpls-lan2 --fixed-ip subnet=mpls-lan2-subnet,ip-address=192.168.20.3 mpls-r3-lan2
+os port create --network ${MPLS_NAME}-mgmt --fixed-ip subnet=${MPLS_NAME}-mgmt-subnet,ip-address=${MPLS_MGMT_NET}.13 ${MPLS_NAME}-r3-mgmt
+os port create --network ${MPLS_NAME}-link2 --fixed-ip subnet=${MPLS_NAME}-link2-subnet,ip-address=172.16.2.3 ${MPLS_NAME}-r3-link2
+os port create --network ${MPLS_NAME}-link3 --fixed-ip subnet=${MPLS_NAME}-link3-subnet,ip-address=172.16.3.3 ${MPLS_NAME}-r3-link3
+os port create --network ${MPLS_NAME}-lan2 --fixed-ip subnet=${MPLS_NAME}-lan2-subnet,ip-address=192.168.20.3 ${MPLS_NAME}-r3-lan2
 
 # R4
-os port create --network mpls-mgmt --fixed-ip subnet=mpls-mgmt-subnet,ip-address=192.168.0.4 mpls-r4-mgmt
-os port create --network mpls-link3 --fixed-ip subnet=mpls-link3-subnet,ip-address=172.16.3.4 mpls-r4-link3
-os port create --network mpls-link4 --fixed-ip subnet=mpls-link4-subnet,ip-address=172.16.4.4 mpls-r4-link4
+os port create --network ${MPLS_NAME}-mgmt --fixed-ip subnet=${MPLS_NAME}-mgmt-subnet,ip-address=${MPLS_MGMT_NET}.14 ${MPLS_NAME}-r4-mgmt
+os port create --network ${MPLS_NAME}-link3 --fixed-ip subnet=${MPLS_NAME}-link3-subnet,ip-address=172.16.3.4 ${MPLS_NAME}-r4-link3
+os port create --network ${MPLS_NAME}-link4 --fixed-ip subnet=${MPLS_NAME}-link4-subnet,ip-address=172.16.4.4 ${MPLS_NAME}-r4-link4
 
 # Utility/Ansible node
 # NOTE: .249
-os port create --network mpls-mgmt --fixed-ip subnet=mpls-mgmt-subnet,ip-address=192.168.0.249 mpls-util-mgmt
-os port create --network mpls-lan1 --fixed-ip subnet=mpls-lan1-subnet,ip-address=192.168.10.249 mpls-client-lan1
-os port create --network mpls-lan2 --fixed-ip subnet=mpls-lan2-subnet,ip-address=192.168.20.249 mpls-client-lan2
+os port create --network ${MPLS_NAME}-mgmt --fixed-ip subnet=${MPLS_NAME}-mgmt-subnet,ip-address=${MPLS_MGMT_NET}.249 ${MPLS_NAME}-util-mgmt
+os port create --network ${MPLS_NAME}-lan1 --fixed-ip subnet=${MPLS_NAME}-lan1-subnet,ip-address=192.168.10.249 ${MPLS_NAME}-client-lan1
+os port create --network ${MPLS_NAME}-lan2 --fixed-ip subnet=${MPLS_NAME}-lan2-subnet,ip-address=192.168.20.249 ${MPLS_NAME}-client-lan2
 
 ```
 
 ## Create Routers
 
-Boot router.
+Boot virtual machine images: routers, util, and client nodes.
 
 *NOTE: Microtik CHR image!*
 
 ```
 openstack server create \
-	--image chr-6.39.3 \
+	--image ${MPLS_MT_IMAGE} \
 	--flavor m1.small \
-	--nic port-id=mpls-r1-mgmt \
-  --nic port-id=mpls-r1-lan1 \
-	--nic port-id=mpls-r1-link1 \
-  --nic port-id=mpls-r1-link4 \
+	--nic port-id=${MPLS_NAME}-r1-mgmt \
+  --nic port-id=${MPLS_NAME}-r1-lan1 \
+	--nic port-id=${MPLS_NAME}-r1-link1 \
+  --nic port-id=${MPLS_NAME}-r1-link4 \
 	--key-name default \
-	mpls-r1
+	${MPLS_NAME}-r1
 
 openstack server create \
-	--image chr-6.39.3 \
+	--image ${MPLS_MT_IMAGE} \
 	--flavor m1.small \
-	--nic port-id=mpls-r2-mgmt \
-	--nic port-id=mpls-r2-link1 \
-  --nic port-id=mpls-r2-link2 \
+	--nic port-id=${MPLS_NAME}-r2-mgmt \
+	--nic port-id=${MPLS_NAME}-r2-link1 \
+  --nic port-id=${MPLS_NAME}-r2-link2 \
 	--key-name default \
-	mpls-r2
+	${MPLS_NAME}-r2
 
 openstack server create \
-	--image chr-6.39.3 \
+	--image ${MPLS_MT_IMAGE} \
 	--flavor m1.small \
-	--nic port-id=mpls-r3-mgmt \
-	--nic port-id=mpls-r3-lan2 \
-  --nic port-id=mpls-r3-link2 \
-  --nic port-id=mpls-r3-link3 \
+	--nic port-id=${MPLS_NAME}-r3-mgmt \
+	--nic port-id=${MPLS_NAME}-r3-lan2 \
+  --nic port-id=${MPLS_NAME}-r3-link2 \
+  --nic port-id=${MPLS_NAME}-r3-link3 \
 	--key-name default \
-	mpls-r3
+	${MPLS_NAME}-r3
 
 openstack server create \
-	--image chr-6.39.3 \
+	--image ${MPLS_MT_IMAGE} \
 	--flavor m1.small \
-	--nic port-id=mpls-r4-mgmt \
-	--nic port-id=mpls-r4-link3 \
-  --nic port-id=mpls-r4-link4 \
+	--nic port-id=${MPLS_NAME}-r4-mgmt \
+	--nic port-id=${MPLS_NAME}-r4-link3 \
+  --nic port-id=${MPLS_NAME}-r4-link4 \
 	--key-name default \
-	mpls-r4
+	${MPLS_NAME}-r4
 
 openstack server create \
 	--image xenial \
 	--flavor m1.medium \
-	--nic port-id=mpls-util-mgmt \
+	--nic port-id=${MPLS_NAME}-util-mgmt \
 	--key-name default \
-	mpls-util
+	${MPLS_NAME}-util
 
 openstack server create \
 	--image xenial \
 	--flavor m1.small \
-	--nic port-id=mpls-client-lan1 \
+	--nic port-id=${MPLS_NAME}-client-lan1 \
 	--key-name default \
-	mpls-client-lan1
+	${MPLS_NAME}-client-lan1
 
 openstack server create \
 	--image xenial \
 	--flavor m1.small \
-	--nic port-id=mpls-client-lan2 \
+	--nic port-id=${MPLS_NAME}-client-lan2 \
 	--key-name default \
-	mpls-client-lan2
+	${MPLS_NAME}-client-lan2
 
 ```
 
@@ -243,13 +252,13 @@ R1:
 ```
 
 ```
-[admin@mpls-r1.novalocal] > mpls traffic-eng interface pr
+[admin@${MPLS_NAME}-r1.novalocal] > mpls traffic-eng interface pr
 Flags: X - disabled, I - invalid
  #   INTERFACE                                                                                                                                              BANDWIDTH  TE-METRIC REMAINING-BW
  0   ether2               10Mbps          1     10.0Mbps
  1   ether3               10Mbps          1     10.0Mbps
  2   ether4               10Mbps          1     10.0Mbps
-[admin@mpls-r1.novalocal] >
+[admin@${MPLS_NAME}-r1.novalocal] >
 ```
 
 R2:
@@ -302,7 +311,7 @@ R1:
 Show tunnel paths.
 
 ```
-[admin@mpls-r1.novalocal] > mpls traffic-eng tunnel-path print
+[admin@${MPLS_NAME}-r1.novalocal] > mpls traffic-eng tunnel-path print
 Flags: X - disabled
  #   NAME                           USE-CSPF HOPS                  
  0   dyn                            yes     
@@ -338,7 +347,7 @@ R3:
 Monitor the tunnel.
 
 ```
-[admin@mpls-r3.novalocal] > interface traffic-eng monitor 0
+[admin@${MPLS_NAME}-r3.novalocal] > interface traffic-eng monitor 0
              tunnel-id: 1
     primary-path-state: established
           primary-path: tun-second-link
@@ -374,6 +383,8 @@ From R1 traceroute to the end of the tunnel.
 ```
 
 ## (Optional) LDP
+
+RSVP-TE is taking care of this AFAIK.
 
 *NOTE: Not sure this is necessary, was not part of the "Simple TE" instructions.*
 
@@ -412,43 +423,132 @@ R4:
 ## MTU
 
 ```
-[admin@mpls-r4.novalocal] > mpls interface print
+[admin@${MPLS_NAME}-r4.novalocal] > mpls interface print
 Flags: X - disabled, * - default
- #    INTERFACE                                                                                                                                                                      MPLS-MTU
+ #    INTERFACE                                                                                                                                                                      ${MPLS_NAME}-MTU
  0  * all     
 ```
 
 Set to 1450?
 
 ```
-[admin@mpls-r3.novalocal] > mpls interface set mpls-mtu=1450 0
-[admin@mpls-r3.novalocal] > mpls interface print
+[admin@${MPLS_NAME}-r3.novalocal] > mpls interface set ${MPLS_NAME}-mtu=1450 0
+[admin@${MPLS_NAME}-r3.novalocal] > mpls interface print
 Flags: X - disabled, * - default
- #    INTERFACE                                                                                                                                                                      MPLS-MTU
+ #    INTERFACE                                                                                                                                                                      ${MPLS_NAME}-MTU
  0  * all        
  ```
+
+## Drop Down to Plain OSPF Routing
+
+If MPLS is not working, we can simply drop down to just routing with plain Layer 3.
+
+* Remove the routes to the LAN1 and LAN2 networks from R1 and R3
+* Remove the 10.99.99.0/30 IPs from the TE-* interfaces on R1 and R3
+* Remove the traffic engineering
+
+R1:
+
+```
+[admin@mpls2-r1.novalocal] > interface traffic-eng remove TE-to-R3
+```
+
+R3:
+
+```
+[admin@mpls2-r3.novalocal] > interface traffic-eng remove TE-to-R1
+```
+
+* Add the LAN1 and LAN2 networks to OSPF
+
+R1:
+
+```
+[admin@mpls2-r1.novalocal] > /routing ospf network add network=192.168.10.0/24 area=backbone
+```
+
+R3:
+
+```
+[admin@mpls2-r1.novalocal] > /routing ospf network add network=192.168.20.0/24 area=backbone
+```
+
+* Add LAN{1,2}.250 as IPs on R1 and R3, as that is the gateway that was set when the subnets were created.
+
+R1:
+
+```
+[admin@mpls2-r1.novalocal] > ip address add address=192.168.10.250/24 interface=ether2
+```
+
+R3:
+
+```
+[admin@mpls2-r3.novalocal] > ip address add address=192.168.20.250/24 interface=ether2   
+```
+
+From R3 we should be able to ping `192.168.10.249` which is client-lan2.
+
+```
+[admin@mpls2-r3.novalocal] > ping 192.168.10.250
+  SEQ HOST                                     SIZE TTL TIME  STATUS                                                                                                                         
+    0 192.168.10.250                             56  63 5ms  
+    1 192.168.10.250                             56  63 1ms  
+    2 192.168.10.250                             56  63 1ms  
+    sent=3 received=3 packet-loss=0% min-rtt=1ms avg-rtt=2ms max-rtt=5ms
+```
+
+And from R1 to `192.168.20.249`:
+
+```
+[admin@mpls2-r1.novalocal] > ping 192.168.20.249
+  SEQ HOST                                     SIZE TTL TIME  STATUS                                                                                                                         
+    0 192.168.20.249                             56  62 1ms  
+    1 192.168.20.249                             56  62 1ms  
+    2 192.168.20.249                             56  62 1ms  
+    sent=3 received=3 packet-loss=0% min-rtt=1ms avg-rtt=1ms max-rtt=1ms
+```
+
+And with that at least Layer 3 routing is working fine.
 
 ## Teardown
 
 Delete servers.
 
+```
+export SERVERS="${MPLS_NAME}-r1             
+${MPLS_NAME}-client-lan2    
+${MPLS_NAME}-client-lan1    
+${MPLS_NAME}-util           
+${MPLS_NAME}-r4             
+${MPLS_NAME}-r3             
+${MPLS_NAME}-r2"
+
+for s in ${SERVERS}; do
+  os server delete $s
+done
+```
+
 Delete ports.
 
 ```
-export PORTS="mpls-r1-mgmt
-mpls-r1-link1
-mpls-r1-link2
-mpls-r1-link6
-mpls-r2-mgmt
-mpls-r2-link2
-mpls-r2-link3
-mpls-r3-mgmt
-mpls-r3-link3
-mpls-r3-link4
-mpls-r3-link5
-mpls-r4-mgmt
-mpls-r4-link5
-mpls-r4-link6"
+export PORTS="${MPLS_NAME}client-lan1
+${MPLS_NAME}client-lan2
+${MPLS_NAME}r1-lan1
+${MPLS_NAME}r1-link1
+${MPLS_NAME}r1-link4
+${MPLS_NAME}r1-mgmt
+${MPLS_NAME}r2-link1
+${MPLS_NAME}r2-link2
+${MPLS_NAME}r2-mgmt
+${MPLS_NAME}r3-lan2
+${MPLS_NAME}r3-link2
+${MPLS_NAME}r3-link3
+${MPLS_NAME}r3-mgmt
+${MPLS_NAME}r4-link3
+${MPLS_NAME}r4-link4
+${MPLS_NAME}r4-mgmt
+${MPLS_NAME}util-mgmt"
 
 for p in $PORTS; do
  os port delete $p
@@ -458,13 +558,13 @@ done
 Subnets:
 
 ```
-export SUBNETS="mpls-mgmt-subnet
-mpls-link1-subnet
-mpls-link2-subnet
-mpls-link3-subnet
-mpls-link4-subnet
-mpls-link5-subnet
-mpls-link6-subnet"
+export SUBNETS="${MPLS_NAME}-mgmt-subnet
+${MPLS_NAME}-link1-subnet
+${MPLS_NAME}-link2-subnet
+${MPLS_NAME}-link3-subnet
+${MPLS_NAME}-link4-subnet
+${MPLS_NAME}-lan1-subnet
+${MPLS_NAME}-lan2-subnet"
 
 for s in $SUBNETS; do
   os subnet delete $s
@@ -474,13 +574,13 @@ done
 Networks:
 
 ```
-export NETS="mpls-mgmt
-mpls-link1
-mpls-link2
-mpls-link3
-mpls-link4
-mpls-link5
-mpls-link6"
+export NETS="${MPLS_NAME}-mgmt
+${MPLS_NAME}-link1
+${MPLS_NAME}-link2
+${MPLS_NAME}-link3
+${MPLS_NAME}-link4
+${MPLS_NAME}-lan1
+${MPLS_NAME}-lan2"
 
 for n in $NETS; do
   os network delete $n
@@ -493,14 +593,16 @@ done
 
 ## Trouble Shooting
 
+Sniffer:
+
 ```
 tool sniffer start
 tool sniffer connection print interval=0.2
 tool sniffer stop
 ```
 
-
 ## links
 
 * [MPLS slides](https://mum.mikrotik.com//presentations/US16/presentation_3327_1462279781.pdf)
 * [MPLS for ISPs - PPoE over VPLS](https://www.youtube.com/watch?v=Q8AF-Srulmk&feature=youtu.be)
+* [MicroTik MPLS RSVP TE](https://wiki.mikrotik.com/wiki/Manual:TE_Tunnels)
