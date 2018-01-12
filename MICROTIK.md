@@ -425,17 +425,17 @@ R4:
 ```
 [admin@${MPLS_NAME}-r4.novalocal] > mpls interface print
 Flags: X - disabled, * - default
- #    INTERFACE                                                                                                                                                                      ${MPLS_NAME}-MTU
+ #    INTERFACE                                                                                                                                                                      MPLS-MTU
  0  * all     
 ```
 
 Set to 1450?
 
 ```
-[admin@${MPLS_NAME}-r3.novalocal] > mpls interface set ${MPLS_NAME}-mtu=1450 0
+[admin@${MPLS_NAME}-r3.novalocal] > mpls interface set mpls-mtu=1450 0
 [admin@${MPLS_NAME}-r3.novalocal] > mpls interface print
 Flags: X - disabled, * - default
- #    INTERFACE                                                                                                                                                                      ${MPLS_NAME}-MTU
+ #    INTERFACE                                                                                                                                                                      MPLS-MTU
  0  * all        
  ```
 
