@@ -4,7 +4,7 @@ This workshop is based on the Microtik documentation for a [Simple TE MPLS netwo
 
 ## NOTE - Issue with CHR and MPLS
 
-MPLS is not working yet with CHR it seems.
+MPLS is not working yet with CHR it seems. At this point the lab attempts to configure MPLS, then drops back to plain Layer 3 with OSPF.
 
 ## Overview
 
@@ -20,7 +20,7 @@ Cloud Hosted Router 6.39.3.
 
 ### Network Diagram
 
-![mpls netowrk diagram](/img/${MPLS_NAME}-microtik.jpg)
+![mpls netowrk diagram](/img/mpls-microtik.jpg)
 
 ## Setup Networks
 
