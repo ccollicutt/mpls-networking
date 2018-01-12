@@ -2,13 +2,17 @@
 
 This workshop is based on the Microtik documentation for a [Simple TE MPLS network](https://wiki.mikrotik.com/wiki/Manual:Simple_TE). Also more information can be found [here](https://wiki.mikrotik.com/wiki/Manual:TE_Tunnels).
 
-## NOTE
+## NOTE - Issue with CHR and MPLS
 
 MPLS is not working yet with CHR it seems.
 
 ## Overview
 
 Several routers are deployed into an OpenStack cloud. Neutron networks are used as links. The routers are configured to be able to support MPLS tunnels.
+
+## OpenStack
+
+These virtual routers are deploying into an OpenStack cloud. The cloud has a global MTU of 1500 and it can't be increased. The links/OpenStack networks are VXLAN based but the OS of the virtual machine would not know that. The cloud is setup in such a way that the VXLAN networks also have an MTU of 1500. The underlying cloud network can support higher MTUs, but based on the configuration of OpenStack in this cloud the tenant virtual machines can only have a max of 1500.
 
 ## Network Diagram
 
@@ -365,6 +369,61 @@ From R1 traceroute to the end of the tunnel.
 /tool traceroute 10.99.99.2
 ```
 
+## LDP
+
+*NOTE: Not sure this is necessary, was not part of the "Simple TE" instructions.*
+
+R1:
+
+```
+/mpls ldp set enabled=yes lsr-id=10.255.0.1 transport-address=10.255.0.1
+/mpls ldp interface add interface=ether3
+/mpls ldp interface add interface=ether4
+```
+
+R2:
+
+```
+/mpls ldp set enabled=yes lsr-id=10.255.0.2 transport-address=10.255.0.2
+/mpls ldp interface add interface=ether2
+/mpls ldp interface add interface=ether3
+```
+
+R3:
+
+```
+/mpls ldp set enabled=yes lsr-id=10.255.0.3 transport-address=10.255.0.3
+/mpls ldp interface add interface=ether3
+/mpls ldp interface add interface=ether4
+```
+
+R4:
+
+```
+/mpls ldp set enabled=yes lsr-id=10.255.0.4 transport-address=10.255.0.4
+/mpls ldp interface add interface=ether2
+/mpls ldp interface add interface=ether3
+```
+
+## MTU
+
+```
+[admin@mpls-r4.novalocal] > mpls interface print
+Flags: X - disabled, * - default
+ #    INTERFACE                                                                                                                                                                      MPLS-MTU
+ 0  * all     
+```
+
+Set to 1450?
+
+```
+[admin@mpls-r3.novalocal] >  mpls interface set mpls-mtu=1450 0
+[admin@mpls-r3.novalocal] > mpls interface print
+Flags: X - disabled, * - default
+ #    INTERFACE                                                                                                                                                                      MPLS-MTU
+ 0  * all        
+ ```
+
 ## Teardown
 
 Delete servers.
@@ -426,4 +485,18 @@ done
 
 ## Issues
 
-* [CHR and MPMLS not working on KVM?](https://forum.mikrotik.com/viewtopic.php?t=122446) and [here](https://forum.mikrotik.com/viewtopic.php?t=128396) (though points to the same forum post)
+* [CHR and MPLS not working on KVM?](https://forum.mikrotik.com/viewtopic.php?t=122446) and [here](https://forum.mikrotik.com/viewtopic.php?t=128396) (though points to the same forum post). That said it seems like a performance thing, not that it doesn't work at all.
+
+## Trouble Shooting
+
+```
+tool sniffer start
+tool sniffer connection print interval=0.2
+tool sniffer stop
+```
+
+
+## links
+
+* [MPLS slides](https://mum.mikrotik.com//presentations/US16/presentation_3327_1462279781.pdf)
+* [MPLS for ISPs - PPoE over VPLS](https://www.youtube.com/watch?v=Q8AF-Srulmk&feature=youtu.be)
