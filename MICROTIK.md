@@ -40,7 +40,7 @@ Create subnets.
 
 *NOTE: dhcp disabled on link networks.*
 
-*NOTE: Gateway on mpls-mgmt-subnet is .255. Gateway has to be specified on links but won't actually be used. We are using .1 as the R1 IP on all networks.*
+*NOTE: Gateway on mpls-mgmt-subnet is .250. Gateway has to be specified on links but won't actually be used. We are using .1 as the R1 IP on all networks.*
 
 ```
 os subnet create --gateway=192.168.0.250 --subnet-range=192.168.0.0/24 --network mpls-mgmt mpls-mgmt-subnet
