@@ -16,7 +16,7 @@ These virtual routers are deploying into an OpenStack cloud. The cloud has a glo
 
 ### MicroTik Version
 
-Cloud Hosted Router 6.39.3.
+Cloud Hosted Router 6.39.3 and 6.41.
 
 ### Network Diagram
 
