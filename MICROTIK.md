@@ -360,7 +360,7 @@ R1:
 /ip route add dst-address=192.168.20.0/24 gateway=10.99.99.2
 ```
 
-R2:
+R3:
 
 ```
 /ip address add address=10.99.99.2/30 interface=TE-to-R1
