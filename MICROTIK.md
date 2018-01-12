@@ -20,7 +20,7 @@ Cloud Hosted Router 6.39.3 and 6.41.
 
 ### Network Diagram
 
-![mpls netowrk diagram](/img/mpls-microtik.jpg)
+![mpls netowrk diagram](/img/${MPLS_NAME}-microtik.jpg)
 
 ## Setup Networks
 
@@ -213,7 +213,7 @@ R1:
 *NOTE: The netmask for the backbone is /21.*
 
 ```
-/routing ospf instance set default router-id=10.255.0.1 mpls-te-area=backbone mpls-te-router-id=Loopback
+/routing ospf instance set default router-id=10.255.0.1 ${MPLS_NAME}-te-area=backbone ${MPLS_NAME}-te-router-id=Loopback
 /routing ospf network add network=172.16.0.0/21 area=backbone
 /routing ospf network add network=10.255.0.1/32 area=backbone
 ```
@@ -221,7 +221,7 @@ R1:
 R2:
 
 ```
-/routing ospf instance set default router-id=10.255.0.2 mpls-te-area=backbone mpls-te-router-id=Loopback
+/routing ospf instance set default router-id=10.255.0.2 ${MPLS_NAME}-te-area=backbone ${MPLS_NAME}-te-router-id=Loopback
 /routing ospf network add network=172.16.0.0/21 area=backbone
 /routing ospf network add network=10.255.0.2/32 area=backbone
 ```
@@ -229,7 +229,7 @@ R2:
 R3:
 
 ```
-/routing ospf instance set default router-id=10.255.0.3 mpls-te-area=backbone mpls-te-router-id=Loopback
+/routing ospf instance set default router-id=10.255.0.3 ${MPLS_NAME}-te-area=backbone ${MPLS_NAME}-te-router-id=Loopback
 /routing ospf network add network=172.16.0.0/21 area=backbone
 /routing ospf network add network=10.255.0.3/32 area=backbone
 ```
@@ -237,7 +237,7 @@ R3:
 R4:
 
 ```
-/routing ospf instance set default router-id=10.255.0.4 mpls-te-area=backbone mpls-te-router-id=Loopback
+/routing ospf instance set default router-id=10.255.0.4 ${MPLS_NAME}-te-area=backbone ${MPLS_NAME}-te-router-id=Loopback
 /routing ospf network add network=172.16.0.0/21 area=backbone
 /routing ospf network add network=10.255.0.4/32 area=backbone
 ```
@@ -425,17 +425,17 @@ R4:
 ```
 [admin@${MPLS_NAME}-r4.novalocal] > mpls interface print
 Flags: X - disabled, * - default
- #    INTERFACE                                                                                                                                                                      MPLS-MTU
+ #    INTERFACE                                                                                                                                                                      ${MPLS_NAME}-MTU
  0  * all     
 ```
 
 Set to 1450?
 
 ```
-[admin@${MPLS_NAME}-r3.novalocal] > mpls interface set mpls-mtu=1450 0
+[admin@${MPLS_NAME}-r3.novalocal] > mpls interface set ${MPLS_NAME}-mtu=1450 0
 [admin@${MPLS_NAME}-r3.novalocal] > mpls interface print
 Flags: X - disabled, * - default
- #    INTERFACE                                                                                                                                                                      MPLS-MTU
+ #    INTERFACE                                                                                                                                                                      ${MPLS_NAME}-MTU
  0  * all        
  ```
 
@@ -532,23 +532,23 @@ done
 Delete ports.
 
 ```
-export PORTS="${MPLS_NAME}client-lan1
-${MPLS_NAME}client-lan2
-${MPLS_NAME}r1-lan1
-${MPLS_NAME}r1-link1
-${MPLS_NAME}r1-link4
-${MPLS_NAME}r1-mgmt
-${MPLS_NAME}r2-link1
-${MPLS_NAME}r2-link2
-${MPLS_NAME}r2-mgmt
-${MPLS_NAME}r3-lan2
-${MPLS_NAME}r3-link2
-${MPLS_NAME}r3-link3
-${MPLS_NAME}r3-mgmt
-${MPLS_NAME}r4-link3
-${MPLS_NAME}r4-link4
-${MPLS_NAME}r4-mgmt
-${MPLS_NAME}util-mgmt"
+export PORTS="${MPLS_NAME}-client-lan1
+${MPLS_NAME}-client-lan2
+${MPLS_NAME}-r1-lan1
+${MPLS_NAME}-r1-link1
+${MPLS_NAME}-r1-link4
+${MPLS_NAME}-r1-mgmt
+${MPLS_NAME}-r2-link1
+${MPLS_NAME}-r2-link2
+${MPLS_NAME}-r2-mgmt
+${MPLS_NAME}-r3-lan2
+${MPLS_NAME}-r3-link2
+${MPLS_NAME}-r3-link3
+${MPLS_NAME}-r3-mgmt
+${MPLS_NAME}-r4-link3
+${MPLS_NAME}-r4-link4
+${MPLS_NAME}-r4-mgmt
+${MPLS_NAME}-util-mgmt"
 
 for p in $PORTS; do
  os port delete $p
