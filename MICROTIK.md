@@ -369,7 +369,7 @@ From R1 traceroute to the end of the tunnel.
 /tool traceroute 10.99.99.2
 ```
 
-## LDP
+## (Optional) LDP
 
 *NOTE: Not sure this is necessary, was not part of the "Simple TE" instructions.*
 
@@ -417,7 +417,7 @@ Flags: X - disabled, * - default
 Set to 1450?
 
 ```
-[admin@mpls-r3.novalocal] >  mpls interface set mpls-mtu=1450 0
+[admin@mpls-r3.novalocal] > mpls interface set mpls-mtu=1450 0
 [admin@mpls-r3.novalocal] > mpls interface print
 Flags: X - disabled, * - default
  #    INTERFACE                                                                                                                                                                      MPLS-MTU
