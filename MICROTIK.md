@@ -20,7 +20,7 @@ Cloud Hosted Router 6.39.3 and 6.41.
 
 ### Network Diagram
 
-![mpls netowrk diagram](/img/${MPLS_NAME}-microtik.jpg)
+![mpls netowrk diagram](/img/mpls-microtik.jpg)
 
 ## Setup Networks
 
