@@ -2,4 +2,5 @@
 
 This repo holds some adventures in MPLS networking.
 
-* [MPLS With Microtik](MICROTIK.md)
+* [MPLS with Juniper vSRX](JUNIPER-MPLS.md)
+* [MPLS With Microtik](MICROTIK.md) - NOTE: Not currently working
