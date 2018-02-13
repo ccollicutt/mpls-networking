@@ -8,9 +8,15 @@ This is a document full of manual steps. Of course there are so many places to m
 
 We are using Ubuntu 16.04 with the Ubuntu Cloud Archive for OpenStack Pike. We are not actually using Pike but we need later versions of various software, specifically libvirt. Without a later version of libvirt we do not get a libvirt that works with `numad` and can't use the `--cpuset=auto` to get numa placement.
 
+## Network Diagram
+
+In the below diagram the `.17x` numbers represent the IP address `192.168.122.17x` which are the managment interfaces, set onto fxp0.
+
+![Network Diagram](img/mpls-juniper.jpg)
+
 ## Requirements
 
-* Juniper vSRX image - Creat a Juniper account and download the image from Juniper
+* Juniper vSRX image - Create a Juniper account and download the image from Juniper
 * A KVM based host to run all the virtual machines on - Should have enough memory to run all the VMs
 * KVM host can run numad and libvirt that work together - So Ubuntu + OpenStack Pike Cloud Archive
 * Some experience with the Juniper command line - Though mostly we will be copying and pasting commands
