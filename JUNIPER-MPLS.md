@@ -12,6 +12,8 @@ We are using Ubuntu 16.04 with the Ubuntu Cloud Archive for OpenStack Pike. We a
 
 In the below diagram the `.17x` numbers represent the IP address `192.168.122.17x` which are the managment interfaces, set onto fxp0.
 
+The `x` in the management IP also indicates the router ID, so `.171` would have a router ID of `1.1.1.1`.
+
 ![Network Diagram](img/mpls-juniper.jpg)
 
 ## Requirements
